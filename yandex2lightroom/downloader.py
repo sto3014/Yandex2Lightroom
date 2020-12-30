@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from dataclasses_json import dataclass_json
 from seleniumwire import webdriver
 
-from exiftool import ExifTool
+from .exiftool import ExifTool
 import sys
 
 Driver = Union[webdriver.Chrome, webdriver.Edge,
