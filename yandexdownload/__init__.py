@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 
 def run_main():
-    from yandex_images_download.yandex_images_download import main
+    from yandexdownload.image_download import main
     main()
 
 

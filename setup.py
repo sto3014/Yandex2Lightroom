@@ -17,28 +17,28 @@ with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
 install_requires = [x.strip() for x in all_reqs]
 
 setup(
-    name='yandex_images_download',
-    packages=['yandex_images_download'],
+    name='yandexdownload',
+    packages=['yandexdownload'],
     version=__version__,
     license='MIT',
     description="Python Script to download images from Yandex.Images",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author = 'Alexander Kozlov',
-    author_email='alexander.kozlovsky.m@gmail.com',
-    url='https://github.com/bobokvsky/yandex-images-download',
-    download_url = f'https://github.com/bobokvsky/yandex-images-download/archive/{__version__}.tar.gz',
+    author='Dieter Stockhausen',
+    author_email='dieter@schwingenhausen.at',
+    url='https://github.com/sto3014/yandexdownload-git',
+    download_url=f'https://github.com/sto3014/yandexdownload-git/archive/main.zip',
     keywords='yandex images download save terminal command-line scrapper',
     install_requires=install_requires,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.9',
     ],
     entry_points={
         "console_scripts": [
-            'yandex-images-download = yandex_images_download:run_main'
+            'yandex-images-download = yandexdownload:run_main'
         ]
     }
 )

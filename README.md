@@ -7,8 +7,8 @@ Python Script to download images from Yandex.Images.
 * Multiproccessing is available (option `--num-workers`)
 
 # Main requirements
-* Python 3.7+
-* [Selenium Wire](https://github.com/wkeeling/selenium-wire) 1.0.8+
+* Python 3.9+
+* [Selenium Wire](https://github.com/wkeeling/selenium-wire) 2.1.2+
 * Firefox, Chrome, Safari and Edge are supported
 
 # Installation
@@ -26,8 +26,3 @@ Example of using keywords from input file with specific image extension/format:
 ```$ yandex-images-download Chrome --keywords_from_file input_example.txt --itype=png```
 
 All other information can be obtained with the `--help` argument.
-
-
-# Acknowledgements
-Special thanks to Andrey Lyashko (https://github.com/andy-landy) for code reviews and collaboration.  
-Special thanks to Boris Kovarski (https://github.com/kovarsky) and Andrey Lyashko (https://github.com/andy-landy) for backing the project.
