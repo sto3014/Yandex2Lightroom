@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 
 def run_main():
-    from yandexdownload.image_download import main
+    from yandex2lightroom.image_download import main
     main()
 
 
