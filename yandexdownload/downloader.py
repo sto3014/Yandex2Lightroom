@@ -14,6 +14,9 @@ from bs4 import BeautifulSoup
 from dataclasses_json import dataclass_json
 from seleniumwire import webdriver
 
+from exiftool import ExifTool
+import sys
+
 Driver = Union[webdriver.Chrome, webdriver.Edge,
                webdriver.Firefox, webdriver.Safari]
 
@@ -110,7 +113,8 @@ def download_single_image(img_url: str,
                           output_directory: pathlib.Path,
                           sub_directory: str = "",
                           multiproccess=False,
-                          skip_existing=False) -> ImgUrlResult:
+                          skip_existing=False,
+                          keyword: str = "") -> ImgUrlResult:
     img_url_result = ImgUrlResult(status="",
                                   message="",
                                   img_url=img_url,
@@ -157,6 +161,12 @@ def download_single_image(img_url: str,
                 img_path = filepath_fix_existing(directory_path, img_name, img_path)
                 with open(img_path, "wb") as f:
                     f.write(data)
+                    exiftool = ExifTool(img_path)
+                    if not exiftool.set_creator_work_url(img_url):
+                        sys.exit(-1)
+                    if not exiftool.set_keywords(keyword):
+                        sys.exit(-1)
+
                 img_url_result.status = "success"
                 img_url_result.message = "Downloaded the image."
                 img_url_result.img_path = str(img_path)
@@ -194,7 +204,7 @@ class YandexImagesDownloader:
     """
 
     MAIN_URL = "https://yandex.ru/images/search"
-    MAXIMUM_PAGES_PER_SEARCH = 50
+    MAXIMUM_PAGES_PER_SEARCH = 51
     MAXIMUM_IMAGES_PER_PAGE = 30
     MAXIMUM_FILENAME_LENGTH = 50
 
@@ -314,12 +324,13 @@ class YandexImagesDownloader:
             if self.pool:
                 img_url_result = self.pool.apply_async(
                     download_single_image,
-                    args=(img_url, self.output_directory, sub_directory, True))
+                    args=(img_url, self.output_directory, sub_directory, self.skip_existing, keyword))
             else:
                 img_url_result = download_single_image(img_url,
                                                        self.output_directory,
                                                        sub_directory,
-                                                       skip_existing=self.skip_existing)
+                                                       skip_existing=self.skip_existing,
+                                                       keyword=keyword)
 
             page_result.img_url_results.append(img_url_result)
 

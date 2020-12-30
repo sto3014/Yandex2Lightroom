@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__version__ = 'v1.0.4'
+__version__ = 'v1.0.0'
 
 here = path.abspath(path.dirname(__file__))
 
@@ -17,18 +17,18 @@ with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
 install_requires = [x.strip() for x in all_reqs]
 
 setup(
-    name='yandexdownload',
-    packages=['yandexdownload'],
+    name='yandex2lightroom',
+    packages=['yandex2lightroom'],
     version=__version__,
     license='MIT',
-    description="Python Script to download images from Yandex.Images",
+    description="Python Script to download images from Yandex.Images for the use in Adobe Lightroom.",
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Dieter Stockhausen',
     author_email='dieter@schwingenhausen.at',
-    url='https://github.com/sto3014/yandexdownload-git',
-    download_url=f'https://github.com/sto3014/yandexdownload-git/archive/main.zip',
-    keywords='yandex images download save terminal command-line scrapper',
+    url='https://github.com/sto3014/yandex2lightroom-git',
+    download_url=f'https://github.com/sto3014/yandex2lightroom-git/archive/main.zip',
+    keywords='yandex images download save terminal command-line scrapper lightroom',
     install_requires=install_requires,
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -38,7 +38,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            'yandex-images-download = yandexdownload:run_main'
+            'yandex2lightroom = yandex2lightroom:run_main'
         ]
     }
 )
