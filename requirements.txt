@@ -6,3 +6,4 @@ dataclasses_json==0.2.14
 selenium_wire==2.1.2
 beautifulsoup4==4.8.0
 setuptools~=51.1.0
+lxml~=4.6.2

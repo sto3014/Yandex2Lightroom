@@ -17,6 +17,24 @@ def parse_args():
                         type=str,
                         default=None)
 
+    parser.add_argument("-o",
+                        "--output-directory",
+                        help=("download images in a specific main directory"),
+                        type=str,
+                        default="downloads")
+
+    parser.add_argument("-l",
+                        "--limit",
+                        help="delimited list input. default: 100",
+                        type=int,
+                        default=100)
+
+    parser.add_argument("-q",
+                        "--quiet-mode",
+                        default=False,
+                        help="do not logging.info() messages",
+                        action="store_true")
+
     input_group.add_argument(
         "-k",
         "--keywords",
@@ -31,11 +49,7 @@ def parse_args():
                              type=str,
                              default=None)
 
-    parser.add_argument("-q",
-                        "--quiet-mode",
-                        default=False,
-                        help="do not logging.info() messages",
-                        action="store_true")
+
 
     input_group.add_argument("-x",
                              "--single-image",
@@ -43,17 +57,7 @@ def parse_args():
                              type=str,
                              default=None)
 
-    parser.add_argument("-o",
-                        "--output-directory",
-                        help=("download images in a specific main directory"),
-                        type=str,
-                        default="downloads")
 
-    parser.add_argument("-l",
-                        "--limit",
-                        help="delimited list input. default: 100",
-                        type=int,
-                        default=100)
 
     size_group = parser.add_mutually_exclusive_group()
 
@@ -74,12 +78,14 @@ def parse_args():
                         type=str,
                         default=None,
                         choices=["horizontal", "vertical", "square"])
+
     parser.add_argument(
         "--itype",
         help="image type",
         type=str,
         default=None,
         choices=["photo", "clipart", "lineart", "face", "demotivator"])
+
     parser.add_argument("--color",
                         help="filter on color",
                         type=str,
@@ -119,7 +125,7 @@ def parse_args():
 
     parser.add_argument("--skip-existing",
                         help="skip existing images",
-                        type=bool,
+                        action='store_true',
                         default=False)
 
     args = parser.parse_args()

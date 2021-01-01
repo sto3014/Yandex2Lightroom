@@ -88,6 +88,7 @@ def save_json(args, downloader_result: DownloaderResult):
                              ensure_ascii=False)
     with open(json_path, "w", encoding="utf-8") as f:
         f.write(pretty_json)
+        f.close()
     logging.info(f"Result information saved: {json_path}.")
 
 
@@ -161,6 +162,7 @@ def download_single_image(img_url: str,
                 img_path = filepath_fix_existing(directory_path, img_name, img_path)
                 with open(img_path, "wb") as f:
                     f.write(data)
+                    f.close()
                     exiftool = ExifTool(img_path)
                     if not exiftool.set_creator_work_url(img_url):
                         sys.exit(-1)
