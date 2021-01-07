@@ -65,7 +65,7 @@ def parse_args():
                             help="image size",
                             type=str,
                             default=None,
-                            choices=["large", "medium", "small"])
+                            choices=["large", "medium", "small", "wallpaper"])
 
     size_group.add_argument("--exact-isize",
                             help=("exact image resolution"),

@@ -7,7 +7,7 @@ Python Script to download images from Yandex.Images for using in Adobe Lightroom
 * Multiproccessing is available (option `--num-workers`)
 * Existing images can be skipped.  
 * Set search keywords as Lightroom keywords.
-* Set image url as creator web address (IPC)
+* Set image url as creator web address (IPTC)
 
 # Main requirements
 * Python 3.9+ 
@@ -46,6 +46,7 @@ Example of using keywords from input file with specific image extension/format:
 ```$ yandex2lightroom Chrome --keywords_from_file input_example.txt --itype=png```
 
 All other information can be obtained with the `--help` argument.
+
 # Use case textures for Photoshop
 Yandex2Lightroom sets keywords in the images after download. The keywords are the same as you define for the searches
 itself.
@@ -130,6 +131,11 @@ select all images and read in the metadata again.
 Also, some images may have no keywords because the exiftool run into a problem. There is a smart collection in LR to 
 look for images without keywords. So at least you have a chance to set keywords manually.
 
+# See also
+The Lightroom plugin [Import From Yandex](https://github.com/sto3014/LRImportFromYandex) offers an integration of
+Yandex to Lightroom into Lightroom.
+
 # Acknowledgements
 Special thanks to Alexander Kozlov (https://pypi.org/project/yandex-images-download/). He did most of the work through 
 his project.
+
