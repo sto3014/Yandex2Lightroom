@@ -114,8 +114,9 @@ def download_single_image(img_url: str,
                           output_directory: pathlib.Path,
                           sub_directory: str = "",
                           multiproccess=False,
-                          skip_existing=False,
-                          keyword: str = "") -> ImgUrlResult:
+                          keyword: str = "",
+                          skip_existing=False) -> ImgUrlResult:
+
     img_url_result = ImgUrlResult(status="",
                                   message="",
                                   img_url=img_url,
@@ -141,6 +142,9 @@ def download_single_image(img_url: str,
 
             img_name = pathlib.Path(urlparse(img_url).path).name
             img_host = pathlib.Path(urlparse(img_url).hostname).name
+
+            # print("Image: " + img_name)
+
             img_name = img_name[:YandexImagesDownloader.MAXIMUM_FILENAME_LENGTH]
 
             directory_path = output_directory / sub_directory / img_host
@@ -326,7 +330,7 @@ class YandexImagesDownloader:
             if self.pool:
                 img_url_result = self.pool.apply_async(
                     download_single_image,
-                    args=(img_url, self.output_directory, sub_directory, self.skip_existing, keyword))
+                    args=(img_url, self.output_directory, sub_directory, False, keyword, self.skip_existing))
             else:
                 img_url_result = download_single_image(img_url,
                                                        self.output_directory,

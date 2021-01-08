@@ -19,7 +19,7 @@ This is the first release. It is based on the project [Yandex Images Download](h
 - Set image url as creator web address (IPTC)
 ### Changed
 ### Fixed
-- in get_response() in download.py replaced request.path by request.url. 
+- Replaced request.path by request.url in get_response() module download.py.
  
 ## [1.0.7] - 2021-01-07
 To update just run 
@@ -28,5 +28,13 @@ To update just run
 ### Added
 - Added wallpaper as additional image size (option --isize=wallpaper)
 ### Changed
- 
 ### Fixed
+
+## [1.0.8] - 2021-01-08
+To update just run 
+```pip install yandex2lightroom```
+
+### Added
+### Changed
+### Fixed
+- Option ``--num-workers`` did not work
