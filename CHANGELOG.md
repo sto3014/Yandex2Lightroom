@@ -47,3 +47,12 @@ To update run
 ### Changed
 -- Change the update command in this file
 ### Fixed
+
+## [1.0.8.2] - 2021-04-18
+To update run  
+```pip install yandex2lightroom==1.0.8.2```
+
+### Added
+### Changed
+-- Complete install_requires and allow all builds of major releases.
+### Fixed
