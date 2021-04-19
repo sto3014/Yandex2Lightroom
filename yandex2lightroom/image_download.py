@@ -81,10 +81,19 @@ def main():
         scrap(args)
 
     except KeyboardInterrupt as e:
+        errlog = args.error_log
+        if errlog:
+            with open(errlog, "w") as f:
+                f.write(e.msg)
         logging.error("KeyboardInterrupt")
         sys.exit(1)
 
     except Exception as e:
+        errlog = args.error_log
+        if errlog:
+            with open(errlog, "w") as f:
+                f.write(e.msg)
+
         logging.error(e, exc_info=True)
         sys.exit(1)
 

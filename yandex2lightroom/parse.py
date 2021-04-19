@@ -35,6 +35,11 @@ def parse_args():
                         help="do not logging.info() messages",
                         action="store_true")
 
+    parser.add_argument("--error-log",
+                        type=str,
+                        help="redirects error messages to the given file")
+
+
     input_group.add_argument(
         "-k",
         "--keywords",
