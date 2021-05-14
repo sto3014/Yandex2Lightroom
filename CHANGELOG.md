@@ -54,5 +54,14 @@ To update run
 
 ### Added
 ### Changed
--- Complete install_requires and allow all builds of major releases.
+- Complete install_requires and allow all builds of major releases.
+### Fixed
+
+## [1.0.9.0] - 2021-04-19
+To update run  
+```pip install yandex2lightroom==1.0.9.0```
+
+### Added
+### Changed
+- Add command line option --error-log to pass error messages via file to Lightroom.
 ### Fixed
