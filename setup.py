@@ -30,7 +30,7 @@ install_requires = [
     "typing>=3.7.4, <4.0",
     "typing-extensions>=3.10.0.2, <4.0",
     "typing-inspect>=0.6.0, <1.0",
-    "urllib3>=1.26.4, <2.0"
+    "urllib3>=1.26.7, <2.0"
 ]
 
 setup(
