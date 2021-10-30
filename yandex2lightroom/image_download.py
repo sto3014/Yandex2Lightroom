@@ -92,7 +92,7 @@ def main():
         errlog = args.error_log
         if errlog:
             with open(errlog, "w") as f:
-                f.write(e.msg)
+                f.write(str(e))
 
         logging.error(e, exc_info=True)
         sys.exit(1)

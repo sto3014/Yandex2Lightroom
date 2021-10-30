@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__version__ = '1.0.9.0'
+__version__ = '1.0.9.1'
 
 here = path.abspath(path.dirname(__file__))
 
@@ -12,25 +12,25 @@ with open('README.md', encoding='utf-8') as f:
 
 
 install_requires = [
-    "beautifulsoup4>=4.8.0, <5.0",
-    "certifi>=2020.12.5, <2021",
-    "chardet>=3.0.4, <4.0",
+    "beautifulsoup4>=4.10.0, <5.0",
+    "certifi>=2021.10.8, <2022",
+    "chardet>=4.0.0, <5.0",
     "dataclasses>=0.6, <1.0",
-    "dataclasses-json>=0.2.14, <1.0",
-    "idna>=2.8, <3.0",
+    "dataclasses-json>=0.5.6, <1.0",
+    "idna>=3.3, <4.0",
     "lxml>=4.6.3, <5.0",
-    "marshmallow>=3.0.0rc6, <4.0",
+    "marshmallow>=3.2, <4.0",
     "marshmallow-enum>=1.5.1, <2.0",
     "mypy-extensions>=0.4.3, <1.0",
-    "requests>=2.22.0, <3.0",
-    "selenium>=3.141.0, <4.0",
-    "selenium-wire>=2.1.2, <3.0",
+    "requests>=2.26.0, <3.0",
+    "selenium>=4.0.0, <5.0",
+    "selenium-wire>=4.5.4, <5.0",
     "soupsieve>=2.1, <3.0",
     "stringcase>=1.2.0, <2.0",
     "typing>=3.7.4, <4.0",
-    "typing-extensions>=3.7.4.3, <4.0",
+    "typing-extensions>=3.10.0.2, <4.0",
     "typing-inspect>=0.6.0, <1.0",
-    "urllib3>=1.25.3, <2.0"
+    "urllib3>=1.26.4, <2.0"
 ]
 
 setup(
