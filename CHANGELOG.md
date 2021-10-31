@@ -75,3 +75,12 @@ To update run
 ### Fixed
 - Shift to selenium-wire 4.5.4 because of captcha issue with current yandex page. 
 Updated all other packages as well.
+
+## [1.0.9.2] - 2021-10-31
+To update run  
+```pip install yandex2lightroom==1.0.9.2```
+
+### Added
+### Changed
+### Fixed
+- Shift to urllib3 1.26.7 for security reasons
