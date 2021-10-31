@@ -11,7 +11,7 @@ Python Script to download images from Yandex.Images for using in Adobe Lightroom
 
 # Main requirements
 * Python 3.9+ 
-* Selenium Wire 2.1.2+  
+* Selenium Wire 4.5.4+  
 * Exiftool 12.13+
 * Chrome, Firefox, Safari and Edge are supported. 
 

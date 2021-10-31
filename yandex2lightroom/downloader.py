@@ -116,7 +116,6 @@ def download_single_image(img_url: str,
                           multiproccess=False,
                           keyword: str = "",
                           skip_existing=False) -> ImgUrlResult:
-
     img_url_result = ImgUrlResult(status="",
                                   message="",
                                   img_url=img_url,
@@ -209,7 +208,7 @@ class YandexImagesDownloader:
     """Class to download images from yandex.ru
     """
 
-    MAIN_URL = "https://yandex.ru/images/search"
+    MAIN_URL = "https://yandex.com/images/search"
     MAXIMUM_PAGES_PER_SEARCH = 51
     MAXIMUM_IMAGES_PER_PAGE = 30
     MAXIMUM_FILENAME_LENGTH = 50
@@ -303,7 +302,7 @@ class YandexImagesDownloader:
 
         response = self.get_response()
 
-        if not (response.reason == "OK"):
+        if response.status_code != 200:
             page_result.status = "fail"
             page_result.message = (f"Page response is not ok."
                                    f" page: {page},",
@@ -373,7 +372,7 @@ class YandexImagesDownloader:
                                    })
         response = self.get_response()
 
-        if not (response.reason == "OK"):
+        if response.status_code != 200:
             keyword_result.status = "fail"
             keyword_result.message = (
                 "Failed to fetch a search page."
@@ -464,17 +463,22 @@ class YandexImagesDownloader:
         del self.driver.requests
         self.driver.get(url_with_params)
 
-        while True:
-            soup = BeautifulSoup(self.driver.page_source, "lxml")
+        soup = BeautifulSoup(self.driver.page_source, "lxml")
+        if soup.select(".form__captcha"):
+            logging.warning(f"Please, type the captcha in the browser")
+            time.sleep(15)
+        elif soup.select("title"):
+            if soup.find("title").contents[0] == "Oops!":
+                logging.warning(f"Please, confirm that you are not a robot and then type the captcha in the browser.")
+                time.sleep(15)
+            else:
+                return
 
-            if not soup.select(".form__captcha"):
-                break
-
-            logging.warning(f"Please, type the captcha in the browser,"
-                            " then press Enter or type [q] to exit")
-            reply = input()
-            if reply == "q":
-                raise YandexImagesDownloader.StopCaptchaInput()
-
-            del self.driver.requests
-            self.driver.get(url_with_params)
+        del self.driver.requests
+        self.driver.get(url_with_params)
+        soup = BeautifulSoup(self.driver.page_source, "lxml")
+        if soup.select(".form__captcha"):
+            raise YandexImagesDownloader.StopCaptchaInput()
+        if soup.select("title"):
+            if soup.find("title").contents[0] == "Oops!":
+                raise YandexImagesDownloader.StopCaptchaInput("No captcha was provided.")

@@ -65,3 +65,22 @@ To update run
 ### Changed
 - Add command line option --error-log to pass error messages via file to Lightroom.
 ### Fixed
+
+## [1.0.9.1] - 2021-10-30
+To update run  
+```pip install yandex2lightroom==1.0.9.1```
+
+### Added
+### Changed
+### Fixed
+- Shift to selenium-wire 4.5.4 because of captcha issue with current yandex page. 
+Updated all other packages as well.
+
+## [1.0.9.2] - 2021-10-31
+To update run  
+```pip install yandex2lightroom==1.0.9.2```
+
+### Added
+### Changed
+### Fixed
+- Shift to urllib3 1.26.7 for security reasons
