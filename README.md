@@ -35,6 +35,9 @@ Python Script to download images from Yandex.Images for using in Adobe Lightroom
 5. [Exiftool](https://exiftool.org)  
    The exiftool executable must added in your PATH. For macOS, it is done automatically by putting it into
    /usr/local/bin. For Windows, you must extend your PATH variable. 
+6. Yandex to Lightroom  
+   * pip install yandex2lightroom
+
 
 # Examples
 Simple example using [Chrome WebDriver](https://sites.google.com/a/chromium.org/chromedriver/):

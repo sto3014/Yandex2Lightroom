@@ -84,3 +84,14 @@ To update run
 ### Changed
 ### Fixed
 - Shift to urllib3 1.26.7 for security reasons
+
+## [1.0.9.3] - 2021-12-28
+To update run  
+```pip install yandex2lightroom==1.0.9.3```
+Remarks: As only documentation has changed an update is not really necessary.
+
+### Added
+### Changed
+Add installation documentation for yandex2lightroom itself.
+### Fixed
+
