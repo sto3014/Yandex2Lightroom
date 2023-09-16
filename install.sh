@@ -16,17 +16,17 @@ if [ -d build ]; then
 fi
 #
 # install from local
-#python setup.py sdist
-#pip install dist/${PROJECT}*.gz --force-reinstall
+python setup.py sdist
+pip install dist/${PROJECT}*.gz --force-reinstall
 #
 # upload to pypi
 #
 # wheel must be installed (.pyenv not venv) before:pip install wheel
-python setup.py bdist_wheel
+##python setup.py bdist_wheel
 # twine must be installed (.pyenv not venv) before:pip install twine
 # user:__token__
-#python3 -m twine upload --repository testpypi dist/*
-python3 -m twine upload --repository pypi dist/*
+##python3 -m twine upload --repository testpypi dist/*
+##python3 -m twine upload --repository pypi dist/*
 
 # cleanup
 if [ -d dist ]; then

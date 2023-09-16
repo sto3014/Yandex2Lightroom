@@ -95,3 +95,13 @@ Remarks: As only documentation has changed an update is not really necessary.
 Add installation documentation for yandex2lightroom itself.
 ### Fixed
 
+## [1.0.9.4] - 2023-09-17
+To update run  
+```pip install yandex2lightroom==1.0.9.4```
+Remarks: As only documentation has changed an update is not really necessary.
+
+### Added
+### Changed
+- Change setup.py: Shift to selenium-wire>=5.1.0, certifi>=2023.7.22, lxml>=4.9.1, requests>=2.31.0
+### Fixed
+
