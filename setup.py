@@ -12,26 +12,26 @@ with open('README.md', encoding='utf-8') as f:
 
 
 install_requires = [
-    "beautifulsoup4>=4.10.0, <5.0",
-    "certifi>=2023.7.22, <2024",
-    "chardet>=4.0.0, <5.0",
-    "dataclasses>=0.6, <1.0",
-    "dataclasses-json>=0.5.6, <1.0",
-    "idna>=3.3, <4.0",
-    "lxml>=4.9.1, <5.0",
-    "marshmallow>=3.2, <4.0",
-    "marshmallow-enum>=1.5.1, <2.0",
-    "mypy-extensions>=0.4.3, <1.0",
-    "pyopenssl>=23.0.0, <24",
-    "requests~=2.31.0, <3.0",
-    "selenium>=4.0.0, <5.0",
-    "selenium-wire>=5.1.0, <=5.1.0",
-    "soupsieve>=2.1, <3.0",
-    "stringcase>=1.2.0, <2.0",
-    "typing>=3.7.4, <4.0",
-    "typing-extensions>=3.10.0.2, <4.0",
-    "typing-inspect>=0.6.0, <1.0",
-    "urllib3>=1.26.7, <2.0"
+    "beautifulsoup4>=4.10.0",
+    "certifi>=2023.7.22",
+    "chardet>=4.0.0",
+    "dataclasses>=0.6",
+    "dataclasses-json>=0.5.6",
+    "idna>=3.3",
+    "lxml>=4.9.1",
+    "marshmallow>=3.2",
+    "marshmallow-enum>=1.5.1",
+    "mypy-extensions>=0.4.3",
+    "pyopenssl>=23.0.0",
+    "requests>=2.31.0",
+    "selenium>=4.0.0",
+    "selenium-wire>=5.1.0",
+    "soupsieve>=2.1",
+    "stringcase>=1.2.0",
+    "typing>=3.7.4",
+    "typing-extensions>=3.10.0.2",
+    "typing-inspect>=0.6.0",
+    "urllib3>=1.26.7"
 ]
 
 setup(
