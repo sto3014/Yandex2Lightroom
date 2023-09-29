@@ -23,7 +23,7 @@ def scrap(args):
     driver = get_driver(args.browser, args.driver_path)
 
     try:
-        pool = Pool(args.num_workers) if (args.num_workers) else None
+        pool = Pool(args.num_workers) if args.num_workers else None
 
         downloader = YandexImagesDownloader(driver, args.output_directory,
                                             args.limit, args.isize,
@@ -74,9 +74,9 @@ def setup_logging(quiet_mode):
     selenium_logger.setLevel(logging.WARNING)
 
 
-def main():
+def main(arguments=None):
     try:
-        args = parse_args()
+        args = parse_args(arguments)
         setup_logging(args.quiet_mode)
         scrap(args)
 

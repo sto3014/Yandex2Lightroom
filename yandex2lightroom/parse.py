@@ -2,12 +2,12 @@ import argparse
 from .downloader import DRIVER_NAME_TO_CLASS
 
 
-def parse_args():
+def parse_args(arguments=None):
     parser = argparse.ArgumentParser()
     input_group = parser.add_mutually_exclusive_group(required=True)
 
     parser.add_argument("browser",
-                        help=("browser with WebDriver"),
+                        help="browser with WebDriver",
                         type=str,
                         choices=list(DRIVER_NAME_TO_CLASS))
 
@@ -39,7 +39,6 @@ def parse_args():
                         type=str,
                         help="redirects error messages to the given file")
 
-
     input_group.add_argument(
         "-k",
         "--keywords",
@@ -54,15 +53,11 @@ def parse_args():
                              type=str,
                              default=None)
 
-
-
     input_group.add_argument("-x",
                              "--single-image",
                              help="downloading a single image from URL",
                              type=str,
                              default=None)
-
-
 
     size_group = parser.add_mutually_exclusive_group()
 
@@ -133,6 +128,6 @@ def parse_args():
                         action='store_true',
                         default=False)
 
-    args = parser.parse_args()
+    args = parser.parse_args(args=arguments)
 
     return args

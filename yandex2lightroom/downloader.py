@@ -13,6 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 from dataclasses_json import dataclass_json
 from seleniumwire import webdriver
+from selenium.webdriver.chrome.service import Service
 
 from .exiftool import ExifTool
 import sys
@@ -30,10 +31,11 @@ DRIVER_NAME_TO_CLASS = {
 
 def get_driver(name: str, path: Optional[str]) -> Driver:
     driver_class = DRIVER_NAME_TO_CLASS[name]
+    service = Service(executable_path=path) if path else None
     if driver_class == DRIVER_NAME_TO_CLASS['Chrome']:
         option = webdriver.ChromeOptions()
         option.add_argument('headless')
-        args = {'executable_path': path, 'chrome_options': option} if path else {'chrome_options': option}
+        args = {'service': service, 'chrome_options': option} if path else {'chrome_options': option}
     else:
         args = {'executable_path': path} if path else {}
 

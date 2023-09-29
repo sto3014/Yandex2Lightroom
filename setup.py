@@ -31,7 +31,8 @@ install_requires = [
     "typing>=3.7.4",
     "typing-extensions>=3.10.0.2",
     "typing-inspect>=0.6.0",
-    "urllib3>=1.26.7"
+    "urllib3>=1.26.7",
+    "webdriver_auto_update>=1.1.0"
 ]
 
 setup(
