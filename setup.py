@@ -37,7 +37,8 @@ install_requires = [
 
 setup(
     name='yandex2lightroom',
-    packages=['yandex2lightroom'],
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
     version=__version__,
     license='MIT',
     description="Python Script to download images from Yandex.Images for the use in Adobe Lightroom.",
