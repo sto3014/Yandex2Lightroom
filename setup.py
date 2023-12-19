@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-__version__ = '1.0.9.5'
+__version__ = '1.1.0.0'
 
 here = path.abspath(path.dirname(__file__))
 
@@ -16,22 +16,22 @@ install_requires = [
     "certifi>=2023.7.22",
     "chardet>=4.0.0",
     "dataclasses>=0.6",
-    "dataclasses-json>=0.5.6",
-    "idna>=3.3",
-    "lxml>=4.9.1",
-    "marshmallow>=3.2",
+    "dataclasses-json>=0.5.14",
+    "idna>=3.4",
+    "lxml>=4.9.3",
+    "marshmallow>=3.20.1",
     "marshmallow-enum>=1.5.1",
     "mypy-extensions>=0.4.3",
     "pyopenssl>=23.0.0",
     "requests>=2.31.0",
-    "selenium>=4.0.0",
+    "selenium>=4.13.0",
     "selenium-wire>=5.1.0",
-    "soupsieve>=2.1",
+    "soupsieve>=2.5",
     "stringcase>=1.2.0",
     "typing>=3.7.4",
     "typing-extensions>=3.10.0.2",
-    "typing-inspect>=0.6.0",
-    "urllib3>=1.26.7",
+    "typing-inspect>=0.9.0",
+    "urllib3>=2.0.5",
     "webdriver_auto_update>=1.1.0"
 ]
 
