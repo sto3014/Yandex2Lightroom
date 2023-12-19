@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 export PROJECT=yandex2lightroom
-cd ~/Projekte/${PROJECT}-git || exit
+cd ~/Projekte/${PROJECT} || exit
 rm dist/*
-python3 setup.py sdist bdist_wheel
+python3.11 setup.py sdist bdist_wheel
 

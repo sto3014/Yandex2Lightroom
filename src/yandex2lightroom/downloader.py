@@ -4,6 +4,7 @@ import logging
 import os
 import pathlib
 import time
+import urllib
 from dataclasses import dataclass
 from math import floor
 from typing import List, Union, Optional
@@ -12,14 +13,15 @@ from urllib.parse import urlparse, urlencode
 import requests
 from bs4 import BeautifulSoup
 from dataclasses_json import dataclass_json
+from selenium.webdriver.common.by import By
 from seleniumwire import webdriver
 from selenium.webdriver.chrome.service import Service
-
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from .exiftool import ExifTool
 import sys
 
-Driver = Union[webdriver.Chrome, webdriver.Edge,
-               webdriver.Firefox, webdriver.Safari]
+Driver = Union[webdriver.Chrome, webdriver.Edge, webdriver.Firefox, webdriver.Safari]
 
 DRIVER_NAME_TO_CLASS = {
     'Chrome': webdriver.Chrome,
@@ -29,12 +31,13 @@ DRIVER_NAME_TO_CLASS = {
 }  # type Dict[str, Driver]
 
 
-def get_driver(name: str, path: Optional[str]) -> Driver:
+def get_driver(name: str, path: Optional[str], show_browser: Optional[bool]) -> Driver:
     driver_class = DRIVER_NAME_TO_CLASS[name]
     service = Service(executable_path=path) if path else None
     if driver_class == DRIVER_NAME_TO_CLASS['Chrome']:
         option = webdriver.ChromeOptions()
-        option.add_argument('headless')
+        if not show_browser:
+            option.add_argument('headless')
         args = {'service': service, 'chrome_options': option} if path else {'chrome_options': option}
     else:
         args = {'executable_path': path} if path else {}
@@ -122,6 +125,12 @@ def download_single_image(img_url: str,
                                   message="",
                                   img_url=img_url,
                                   img_path="")
+
+    debug = False
+    if debug:
+        img_url_result.status = "planned"
+        img_url_result.message = "download omitted"
+        return img_url_result
 
     img_extensions = (".jpg", ".jpeg", ".jfif", "jpe", ".gif", ".png", ".bmp",
                       ".svg", ".webp", ".ico")
@@ -228,7 +237,9 @@ class YandexImagesDownloader:
                  commercial=None,
                  recent=None,
                  pool=None,
-                 skip_existing=False):
+                 skip_existing=False,
+                 show_browser=False,
+                 delay_for_refresh=2):
         self.driver = driver
         self.output_directory = pathlib.Path(output_directory)
         self.limit = limit
@@ -241,6 +252,8 @@ class YandexImagesDownloader:
         self.commercial = commercial
         self.recent = recent
         self.skip_existing = skip_existing
+        self.show_browser = show_browser
+        self.delay_for_refresh=delay_for_refresh
 
         self.url_params = self.init_url_params()
         self.requests_headers = {
@@ -289,74 +302,58 @@ class YandexImagesDownloader:
 
         return params
 
-    def download_images_by_page(self, keyword, page, imgs_count,
-                                sub_directory) -> PageResult:
+    def count_available_images(self):
+        soup = BeautifulSoup(self.driver.page_source, "lxml")
+        image_cover_list = soup.find_all("a", class_="Link SimpleImage-Cover")
+        if not image_cover_list:
+            return 0
+        else:
+            return len(image_cover_list)
 
-        page_result = PageResult(status="",
-                                 message="",
-                                 page=page,
-                                 errors_count=0,
-                                 skipped_count=0,
-                                 img_url_results=[])
-
-        self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL,
-                                   params=self.get_url_params(page, keyword))
-
-        response = self.get_response()
-
-        if response.status_code != 200:
-            page_result.status = "fail"
-            page_result.message = (f"Page response is not ok."
-                                   f" page: {page},",
-                                   f" status_code: {response.status_code}.")
-            page_result.errors_count = YandexImagesDownloader.MAXIMUM_IMAGES_PER_PAGE
-            return page_result
-
-        soup_page = BeautifulSoup(self.driver.page_source, "lxml")
-
-        # Getting all image urls from page.
-        tag_sepr_item = soup_page.find_all("div", class_="serp-item")
-        serp_items = [
-            json.loads(item.attrs["data-bem"])["serp-item"]
-            for item in tag_sepr_item
-        ]
-        img_hrefs = [key["img_href"] for key in serp_items]
-
-        errors_count = 0
-        skipped_count = 0
-        for img_url in img_hrefs:
-            if imgs_count >= self.limit:
+    def wait_for_images(self):
+        logging.info("wait_for_images() start")
+        images_available = self.count_available_images()
+        logging.info(f"available={images_available} limit={self.limit}")
+        last_images_available = 0
+        while images_available < self.limit:
+            if last_images_available == images_available:
                 break
+            last_images_available = images_available
 
-            if self.pool:
-                img_url_result = self.pool.apply_async(
-                    download_single_image,
-                    args=(img_url, self.output_directory, sub_directory, False, keyword, self.skip_existing))
-            else:
-                img_url_result = download_single_image(img_url,
-                                                       self.output_directory,
-                                                       sub_directory,
-                                                       skip_existing=self.skip_existing,
-                                                       keyword=keyword)
+            # Get scroll height
+            last_height = self.driver.execute_script("return document.body.scrollHeight")
 
-            page_result.img_url_results.append(img_url_result)
+            while True:
+                # Scroll down to bottom
+                logging.info("scroll down and wait")
+                self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-            imgs_count += 1
+                # Wait to load page
+                time.sleep(self.delay_for_refresh)
+                images_available = self.count_available_images()
+                logging.info(f"available={images_available} limit={self.limit}")
+                if images_available >= self.limit:
+                    break
 
-        if self.pool:
-            for i, img_url_result in enumerate(page_result.img_url_results):
-                page_result.img_url_results[i] = img_url_result.get()
-        errors_count += sum(1 if page_result.status == "fail" else 0
-                            for page_result in page_result.img_url_results)
-        skipped_count += sum(1 if page_result.status == "skipped" else 0
-                             for page_result in page_result.img_url_results)
+                # Calculate new scroll height and compare with last scroll height
+                new_height = self.driver.execute_script("return document.body.scrollHeight")
+                if new_height == last_height:
+                    # Show more results
+                    logging.info("End of page reached")
+                    logging.info("Show more images")
+                    self.driver.find_element(By.XPATH, "//div[@class='SerpList-LoadContent']/button").click()
+                    time.sleep(self.delay_for_refresh)
+                    images_available = self.count_available_images()
+                else:
+                    last_height = new_height
 
-        page_result.status = "success"
-        page_result.message = f"All successful images from page {page} downloaded."
-        page_result.errors_count = errors_count
-        page_result.skipped_count = skipped_count
+                if last_images_available == images_available:
+                    logging.info("No more images found. Break.")
+                    break
+                else:
+                    last_images_available = images_available
 
-        return page_result
+        logging.info("wait_for_images() end")
 
     def download_images_by_keyword(self, keyword,
                                    sub_directory="") -> KeywordResult:
@@ -383,75 +380,97 @@ class YandexImagesDownloader:
                 f" status_code: {response.status_code}")
             return keyword_result
 
-        soup = BeautifulSoup(self.driver.page_source, "lxml")
+        self.wait_for_images()
 
-        # Getting last_page.
-        tag_serp_list = soup.find("div", class_="serp-list")
-        if not tag_serp_list:
+        soup = BeautifulSoup(self.driver.page_source, "lxml")
+        image_cover_list = soup.find_all("a", class_="Link SimpleImage-Cover")
+
+        if not image_cover_list:
             keyword_result.status = "success"
             keyword_result.message = f"No images with keyword {keyword} found."
             keyword_result.errors_count = 0
-            logging.info(f"    {keyword_result.message}")
             return keyword_result
-        serp_list = json.loads(tag_serp_list.attrs["data-bem"])["serp-list"]
-        last_page = serp_list["lastPage"]
-        actual_last_page = 1 + floor(
-            self.limit / YandexImagesDownloader.MAXIMUM_IMAGES_PER_PAGE)
 
-        logging.info(f"  Found {last_page + 1} pages of {keyword}.")
+        img_url_pos = 1
+        image_urls = [
+            urllib.parse.unquote(item.attrs["href"].split("&")[img_url_pos][len("img_url="):])
+            for item in image_cover_list
+        ]
+        logging.info(f"Found at least {len(image_urls)} images for download.")
 
-        # Getting all images.
-        imgs_count = 0
         errors_count = 0
         skipped_count = 0
+        image_count = 0
 
-        for page in range(last_page + 1):
-            if imgs_count >= self.limit:
+        page_result = PageResult(status="",
+                                 message="",
+                                 page=0,
+                                 errors_count=0,
+                                 skipped_count=0,
+                                 img_url_results=[])
+
+        for image_url in image_urls:
+
+            if image_count >= self.limit:
                 break
 
-            if page > actual_last_page:
-                actual_last_page += 1
+            if self.pool:
+                img_url_result = self.pool.apply_async(
+                    download_single_image,
+                    args=(image_url, self.output_directory, sub_directory, False, keyword, self.skip_existing))
+            else:
+                img_url_result = download_single_image(image_url,
+                                                       self.output_directory,
+                                                       sub_directory,
+                                                       skip_existing=self.skip_existing,
+                                                       keyword=keyword)
 
-            logging.info(f"  Scrapping page {page + 1}/{actual_last_page}...")
+            page_result.img_url_results.append(img_url_result)
 
-            page_result = self.download_images_by_page(keyword, page,
-                                                       imgs_count,
-                                                       sub_directory)
-            keyword_result.page_results.append(page_result)
+            image_count += 1
 
-            imgs_count += len(page_result.img_url_results)
-            errors_count += page_result.errors_count
-            skipped_count += page_result.skipped_count
+        if self.pool:
+            for i, img_url_result in enumerate(page_result.img_url_results):
+                page_result.img_url_results[i] = img_url_result.get()
+        errors_count += sum(1 if page_result.status == "fail" else 0
+                            for page_result in page_result.img_url_results)
+        skipped_count += sum(1 if page_result.status == "skipped" else 0
+                             for page_result in page_result.img_url_results)
 
-            time.sleep(0.5)  # bot id protection
+#        page_result.status = "success"
+#        page_result.message = f"All successful images from page downloaded."
+#        page_result.errors_count = errors_count
+#        page_result.skipped_count = skipped_count
+
+#        keyword_result.page_results.append(page_result)
 
         keyword_result.status = "success"
-        keyword_result.message = f"All images for {keyword} downloaded!"
+        keyword_result.message = f"Images for keywords '{keyword}' downloaded"
         keyword_result.errors_count = errors_count
         keyword_result.skipped_count = skipped_count
 
         return keyword_result
 
     def download_images(self, keywords: List[str]) -> DownloaderResult:
-        dowloader_result = DownloaderResult(status="",
-                                            message="",
-                                            keyword_results=[])
+        downloader_result = DownloaderResult(status="",
+                                             message="",
+                                             keyword_results=[])
 
-        dowloader_result.status = "fail"
+        downloader_result.status = "fail"
 
         for keyword in keywords:
             logging.info(f"Downloading images for {keyword}...")
 
             keyword_result = self.download_images_by_keyword(
                 keyword, sub_directory=keyword)
-            dowloader_result.keyword_results.append(keyword_result)
+            downloader_result.keyword_results.append(keyword_result)
 
             logging.info(keyword_result.message)
 
-        dowloader_result.status = "success"
-        dowloader_result.message = "Everything is downloaded!"
+        downloader_result.status = "success"
+        downloader_result.message = "Everything is downloaded!"
 
-        return dowloader_result
+        return downloader_result
 
     class StopCaptchaInput(Exception):
         pass
@@ -463,7 +482,13 @@ class YandexImagesDownloader:
         url_with_params = f"{url}?{urlencode(params)}"
 
         del self.driver.requests
+        logging.info("Get URL: " + url_with_params)
         self.driver.get(url_with_params)
+        # time.sleep(10)
+        # self.driver.find_element(By.XPATH, "//div[contains(text(), 'Allow all')").click()
+
+        WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(
+            (By.XPATH, "//div[contains(text(), 'Allow all')]"))).click()
 
         soup = BeautifulSoup(self.driver.page_source, "lxml")
         if soup.select(".form__captcha"):
@@ -478,6 +503,8 @@ class YandexImagesDownloader:
 
         del self.driver.requests
         self.driver.get(url_with_params)
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+            (By.XPATH, "//div[contains(text(), 'Allow all')]"))).click()
         soup = BeautifulSoup(self.driver.page_source, "lxml")
         if soup.select(".form__captcha"):
             raise YandexImagesDownloader.StopCaptchaInput()

@@ -128,6 +128,16 @@ def parse_args(arguments=None):
                         action='store_true',
                         default=False)
 
+    parser.add_argument("--show-browser",
+                        help="show browser window",
+                        action="store_true",
+                        default=False)
+
+    parser.add_argument("--delay-for-refresh",
+                        help="delay time for refreshing the page",
+                        type=int,
+                        default=2)
+
     args = parser.parse_args(args=arguments)
 
     return args

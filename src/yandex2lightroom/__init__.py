@@ -9,7 +9,7 @@ def run_main():
     from yandex2lightroom.default_locations import DefaultLocations
     driver_directory = DefaultLocations().get_chromedriver_location()
     if platform.machine() != 'aarch64':
-        from webdriver_auto_update import WebdriverAutoUpdate
+        from webdriver_auto_update.webdriver_auto_update import WebdriverAutoUpdate
         WebdriverAutoUpdate(driver_directory).main()
     args = None
     if len(sys.argv) == 1:

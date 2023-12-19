@@ -2,9 +2,11 @@
 # as venv is activated we must reset PATH
 echo current python is: `which python`
 export PATH=`echo $PATH | tr ":" "\n" | grep -v "venv/bin" | tr "\n" ":"`
-echo switched to: `pyenv which python`
+# echo switched to: `pyenv which python`
+export PATH=/Library/Frameworks/Python.framework/Versions/3.11/bin:$PATH
+echo $PATH
 export PROJECT=yandex2lightroom
-cd ~/Projekte/${PROJECT}-git || exit 1
+cd ~/Projekte/${PROJECT} || exit 1
 if [ -d dist ]; then
   rm -r dist
 fi
@@ -16,8 +18,8 @@ if [ -d build ]; then
 fi
 #
 # install from local
-python setup.py sdist
-pip install dist/${PROJECT}*.gz --force-reinstall
+python3 setup.py sdist
+pip3 install dist/${PROJECT}*.gz --force-reinstall
 #
 # upload to pypi
 #

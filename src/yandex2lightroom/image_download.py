@@ -1,3 +1,4 @@
+import os
 import time
 import logging
 import pathlib
@@ -20,7 +21,7 @@ def scrap(args):
         with open(args.keywords_from_file, "r") as f:
             keywords.extend([line.strip() for line in f])
 
-    driver = get_driver(args.browser, args.driver_path)
+    driver = get_driver(args.browser, args.driver_path, args.show_browser)
 
     try:
         pool = Pool(args.num_workers) if args.num_workers else None
@@ -30,7 +31,8 @@ def scrap(args):
                                             args.exact_isize, args.iorient,
                                             args.extension, args.color,
                                             args.itype, args.commercial,
-                                            args.recent, pool, args.skip_existing)
+                                            args.recent, pool, args.skip_existing, args.show_browser,
+                                            args.delay_for_refresh)
 
         start_time = time.time()
         total_errors = 0
@@ -57,7 +59,7 @@ def scrap(args):
 
     total_time = time.time() - start_time
 
-    logging.info("\nEverything downloaded!")
+    logging.info("Download completed.")
     logging.info(f"Total errors: {total_errors}")
     logging.info(f"Total skipped: {total_skipped}")
     logging.info(
@@ -67,9 +69,10 @@ def scrap(args):
         save_json(args, downloader_result)
 
 
-def setup_logging(quiet_mode):
-    logging.basicConfig(level=logging.WARNING if quiet_mode else logging.INFO,
-                        format="%(message)s")
+def setup_logging(quiet_mode, output_directory):
+    log_file = os.path.join(output_directory, 'yandex2lightroom.log')
+    logging.basicConfig(filename=log_file, level=logging.WARNING if quiet_mode else logging.INFO,
+                        format="%(asctime)s %(levelname)-8s %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
     selenium_logger = logging.getLogger('seleniumwire')
     selenium_logger.setLevel(logging.WARNING)
 
@@ -77,7 +80,12 @@ def setup_logging(quiet_mode):
 def main(arguments=None):
     try:
         args = parse_args(arguments)
-        setup_logging(args.quiet_mode)
+        if args.output_directory[0] != "/" and args.output_directory[1] != ":":
+            # output_directory is relative path
+            home_directory = os.path.expanduser('~')
+            args.output_directory = os.path.join(home_directory, args.output_directory)
+        setup_logging(args.quiet_mode, args.output_directory)
+        logging.info(f"arg: show_browser={args.show_browser}")
         scrap(args)
 
     except KeyboardInterrupt as e:
