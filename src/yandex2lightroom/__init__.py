@@ -6,16 +6,15 @@ import os
 
 def run_main():
     from yandex2lightroom.image_download import main
-    from yandex2lightroom.default_locations import DefaultLocations
-    driver_directory = DefaultLocations().get_chromedriver_location()
-    if platform.machine() != 'aarch64':
-        from webdriver_auto_update.webdriver_auto_update import WebdriverAutoUpdate
-        WebdriverAutoUpdate(driver_directory).main()
+    if sys.argv[1] == "Chrome":
+        from yandex2lightroom.default_locations import DefaultLocations
+        driver_directory = DefaultLocations().get_chromedriver_location()
+        if platform.machine() != 'aarch64':
+            from webdriver_auto_update.webdriver_auto_update import WebdriverAutoUpdate
+            WebdriverAutoUpdate(driver_directory).main()
     args = None
     if len(sys.argv) == 1:
-        chromedriver_exe = "chromedriver" if sys.platform.startswith('linux') or sys.platform.startswith(
-            'darwin') else "chromedriver.exe"
-        args = ["Chrome", "-k", "New Topographic", "-l", "5", "-dp", os.path.join(driver_directory, chromedriver_exe)]
+        args = ["Firefox", "-k", "New Topographics", "-l", "5"]
     main(args)
 
 

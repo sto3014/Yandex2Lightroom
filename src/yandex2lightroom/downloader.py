@@ -40,7 +40,7 @@ def get_driver(name: str, path: Optional[str], show_browser: Optional[bool]) -> 
             option.add_argument('headless')
         args = {'service': service, 'chrome_options': option} if path else {'chrome_options': option}
     else:
-        args = {'executable_path': path} if path else {}
+        args = {}
 
     return driver_class(**args)
 
@@ -143,12 +143,14 @@ def download_single_image(img_url: str,
     }
 
     try:
+        logging.info(f"Download image '{img_url}'")
         response = requests.get(img_url, timeout=10)
 
         data = response.content
         content_type = response.headers["Content-Type"]
 
         if response.ok:
+            logging.info("Response ok")
 
             img_name = pathlib.Path(urlparse(img_url).path).name
             img_host = pathlib.Path(urlparse(img_url).hostname).name
@@ -187,6 +189,8 @@ def download_single_image(img_url: str,
                 img_url_result.message = "Downloaded the image."
                 img_url_result.img_path = str(img_path)
         else:
+            logging.info(f"Response {response}")
+            logging.info(f"Image could not be downloaded.")
             img_url_result.status = "fail"
             img_url_result.message = (f"img_url response is not ok."
                                       f" response: {response}.")
@@ -253,7 +257,7 @@ class YandexImagesDownloader:
         self.recent = recent
         self.skip_existing = skip_existing
         self.show_browser = show_browser
-        self.delay_for_refresh=delay_for_refresh
+        self.delay_for_refresh = delay_for_refresh
 
         self.url_params = self.init_url_params()
         self.requests_headers = {
@@ -337,6 +341,8 @@ class YandexImagesDownloader:
 
                 # Calculate new scroll height and compare with last scroll height
                 new_height = self.driver.execute_script("return document.body.scrollHeight")
+                logging.info(f"last_height={last_height}")
+                logging.info(f"new_height={new_height}")
                 if new_height == last_height:
                     # Show more results
                     logging.info("End of page reached")
@@ -391,11 +397,20 @@ class YandexImagesDownloader:
             keyword_result.errors_count = 0
             return keyword_result
 
-        img_url_pos = 1
-        image_urls = [
-            urllib.parse.unquote(item.attrs["href"].split("&")[img_url_pos][len("img_url="):])
-            for item in image_cover_list
-        ]
+        image_urls = []
+        count = 0
+        for item in image_cover_list:
+            if count >= self.limit:
+                break
+            href = urllib.parse.unquote(item.attrs["href"])
+            logging.info(f"href={href}")
+            for value in href.split("&"):
+                if value.startswith("img_url="):
+                    url_img = value[8:]
+                    image_urls.append(url_img)
+                    logging.info(f"url_img={url_img}")
+                    count = count + 1
+
         logging.info(f"Found at least {len(image_urls)} images for download.")
 
         errors_count = 0
@@ -436,13 +451,6 @@ class YandexImagesDownloader:
                             for page_result in page_result.img_url_results)
         skipped_count += sum(1 if page_result.status == "skipped" else 0
                              for page_result in page_result.img_url_results)
-
-#        page_result.status = "success"
-#        page_result.message = f"All successful images from page downloaded."
-#        page_result.errors_count = errors_count
-#        page_result.skipped_count = skipped_count
-
-#        keyword_result.page_results.append(page_result)
 
         keyword_result.status = "success"
         keyword_result.message = f"Images for keywords '{keyword}' downloaded"
@@ -487,8 +495,10 @@ class YandexImagesDownloader:
         # time.sleep(10)
         # self.driver.find_element(By.XPATH, "//div[contains(text(), 'Allow all')").click()
 
+        # <div> class ="gdpr-popup-v3-button gdpr-popup-v3-button_id_all" > Alle zulassen < /div >
+        x_path = f"//div[@class='gdpr-popup-v3-button gdpr-popup-v3-button_id_all']"
         WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(
-            (By.XPATH, "//div[contains(text(), 'Allow all')]"))).click()
+            (By.XPATH, x_path))).click()
 
         soup = BeautifulSoup(self.driver.page_source, "lxml")
         if soup.select(".form__captcha"):
@@ -504,7 +514,7 @@ class YandexImagesDownloader:
         del self.driver.requests
         self.driver.get(url_with_params)
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
-            (By.XPATH, "//div[contains(text(), 'Allow all')]"))).click()
+            (By.XPATH, x_path))).click()
         soup = BeautifulSoup(self.driver.page_source, "lxml")
         if soup.select(".form__captcha"):
             raise YandexImagesDownloader.StopCaptchaInput()
