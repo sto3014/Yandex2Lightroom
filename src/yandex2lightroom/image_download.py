@@ -32,7 +32,8 @@ def scrap(args):
                                             args.extension, args.color,
                                             args.itype, args.commercial,
                                             args.recent, pool, args.skip_existing, args.show_browser,
-                                            args.delay_for_refresh)
+                                            args.delay_for_refresh, args.delay_for_captcha_handling,
+                                            args.wait_for_captcha_handling)
 
         start_time = time.time()
         total_errors = 0

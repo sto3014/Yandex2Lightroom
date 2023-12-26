@@ -132,6 +132,10 @@ def download_single_image(img_url: str,
         img_url_result.message = "download omitted"
         return img_url_result
 
+    # log_file = os.path.join(output_directory, 'yandex2lightroom.log')
+    # logging.basicConfig(filename=log_file, level=logging.INFO,
+    #                    format="%(asctime)s %(levelname)-8s %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
+
     img_extensions = (".jpg", ".jpeg", ".jfif", "jpe", ".gif", ".png", ".bmp",
                       ".svg", ".webp", ".ico")
     content_type_to_ext = {
@@ -243,7 +247,9 @@ class YandexImagesDownloader:
                  pool=None,
                  skip_existing=False,
                  show_browser=False,
-                 delay_for_refresh=2):
+                 delay_for_refresh=2,
+                 delay_for_captcha_handling=30,
+                 wait_for_captcha_handling=False):
         self.driver = driver
         self.output_directory = pathlib.Path(output_directory)
         self.limit = limit
@@ -258,6 +264,8 @@ class YandexImagesDownloader:
         self.skip_existing = skip_existing
         self.show_browser = show_browser
         self.delay_for_refresh = delay_for_refresh
+        self.delay_for_captcha_handling = delay_for_captcha_handling
+        self.wait_for_captcha_handling = wait_for_captcha_handling
 
         self.url_params = self.init_url_params()
         self.requests_headers = {
@@ -492,32 +500,18 @@ class YandexImagesDownloader:
         del self.driver.requests
         logging.info("Get URL: " + url_with_params)
         self.driver.get(url_with_params)
-        # time.sleep(10)
-        # self.driver.find_element(By.XPATH, "//div[contains(text(), 'Allow all')").click()
 
-        # <div> class ="gdpr-popup-v3-button gdpr-popup-v3-button_id_all" > Alle zulassen < /div >
-        x_path = f"//div[@class='gdpr-popup-v3-button gdpr-popup-v3-button_id_all']"
-        WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(
-            (By.XPATH, x_path))).click()
-
-        soup = BeautifulSoup(self.driver.page_source, "lxml")
-        if soup.select(".form__captcha"):
-            logging.warning(f"Please, type the captcha in the browser")
-            time.sleep(15)
-        elif soup.select("title"):
-            if soup.find("title").contents[0] == "Oops!":
-                logging.warning(f"Please, confirm that you are not a robot and then type the captcha in the browser.")
-                time.sleep(15)
-            else:
-                return
-
-        del self.driver.requests
-        self.driver.get(url_with_params)
-        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
-            (By.XPATH, x_path))).click()
-        soup = BeautifulSoup(self.driver.page_source, "lxml")
-        if soup.select(".form__captcha"):
-            raise YandexImagesDownloader.StopCaptchaInput()
-        if soup.select("title"):
-            if soup.find("title").contents[0] == "Oops!":
-                raise YandexImagesDownloader.StopCaptchaInput("No captcha was provided.")
+        if self.wait_for_captcha_handling:
+            logging.info(f"Wait {self.delay_for_captcha_handling} seconds for captcha handling.")
+            time.sleep(self.delay_for_captcha_handling)
+        else:
+            logging.info("Looking for cookies button.")
+            x_path = f"//div[@class='gdpr-popup-v3-button gdpr-popup-v3-button_id_all']"
+            try:
+                WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable(
+                    (By.XPATH, x_path))).click()
+                logging.info("Cookies button was pushed.")
+            except Exception as e:
+                logging.error(f"Cookie handling failed. {e}")
+                logging.info("Expect captcha request.")
+                logging.info(f"Wait {self.delay_for_captcha_handling} seconds for captcha handling.")

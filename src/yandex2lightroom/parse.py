@@ -138,6 +138,16 @@ def parse_args(arguments=None):
                         type=int,
                         default=2)
 
+    parser.add_argument("--delay-for-captcha-handling",
+                        help="delay time for handling captcha ",
+                        type=int,
+                        default=30)
+
+    parser.add_argument("--wait-for-captcha-handling",
+                        help="delay time for handling captcha ",
+                        action="store_true",
+                        default=False)
+
     args = parser.parse_args(args=arguments)
 
     return args
