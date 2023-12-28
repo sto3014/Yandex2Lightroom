@@ -290,6 +290,7 @@ class YandexImagesDownloader:
         params = {
             "nomisspell": 1,
             "isize": self.isize,
+            "wp": None,
             "iw": None,
             "ih": None,
             "iorient": self.iorient,
@@ -306,6 +307,8 @@ class YandexImagesDownloader:
             params["iw"] = width
             params["ih"] = height
 
+        if self.isize == "wallpaper":
+            params["wp"] = "wh16x10_2560x1600"
         return params
 
     def get_url_params(self, page, text):
@@ -369,7 +372,7 @@ class YandexImagesDownloader:
 
         logging.info("wait_for_images() end")
 
-    def download_images_by_keyword(self, keyword,
+    def download_images_by_keyword(self, keyword, isize,
                                    sub_directory="") -> KeywordResult:
         keyword_result = KeywordResult(status="",
                                        message="",
@@ -378,9 +381,19 @@ class YandexImagesDownloader:
                                        skipped_count=0,
                                        page_results=[])
 
-        self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL,
+        if isize == "wallpaper":
+            self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL,
+                                       params={
+                                           'text': keyword,
+                                           'isize': isize,
+                                           'wp': "wh16x10_2560x1600",
+                                           "nomisspell": 1
+                                       })
+        else:
+            self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL,
                                    params={
                                        'text': keyword,
+                                       'isize': isize,
                                        "nomisspell": 1
                                    })
         response = self.get_response()
@@ -467,7 +480,7 @@ class YandexImagesDownloader:
 
         return keyword_result
 
-    def download_images(self, keywords: List[str]) -> DownloaderResult:
+    def download_images(self, keywords: List[str], isize) -> DownloaderResult:
         downloader_result = DownloaderResult(status="",
                                              message="",
                                              keyword_results=[])
@@ -478,7 +491,7 @@ class YandexImagesDownloader:
             logging.info(f"Downloading images for {keyword}...")
 
             keyword_result = self.download_images_by_keyword(
-                keyword, sub_directory=keyword)
+                keyword, isize, sub_directory=keyword)
             downloader_result.keyword_results.append(keyword_result)
 
             logging.info(keyword_result.message)

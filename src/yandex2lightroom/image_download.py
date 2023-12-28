@@ -40,7 +40,7 @@ def scrap(args):
         total_skipped = 0
 
         if keywords:
-            downloader_result = downloader.download_images(keywords)
+            downloader_result = downloader.download_images(keywords, args.isize)
             total_errors += sum(
                 keyword_result.errors_count
                 for keyword_result in downloader_result.keyword_results)
