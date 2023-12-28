@@ -146,12 +146,19 @@ Remarks: As only documentation has changed an update is not really necessary.
 
 ### Fixed
 
-## [1.1.0.0] - 2023-12-19
+## [1.1.0.0] - 2023-12-28
 
 ### Added
 
+- Added Firefox support
+- Added cookies support
+
 ### Changed
+
+- Browser is displayed by default
 
 ### Fixed
 
-- Fix cookies issue and new page structure
+- Fix issue with new page structure
+- Fix isize and wallpaper issue
+- Fixed captcha handling
